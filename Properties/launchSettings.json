@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "utc-clock (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "utc-clock (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
