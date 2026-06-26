@@ -9,5 +9,6 @@
   <ItemGroup>
     <Compile Include="..\Services\LaunchOptions.cs" Link="Services\LaunchOptions.cs" />
     <Compile Include="..\Services\PositionMath.cs" Link="Services\PositionMath.cs" />
+    <Compile Include="..\Services\StartupRegistration.cs" Link="Services\StartupRegistration.cs" />
   </ItemGroup>
 </Project>

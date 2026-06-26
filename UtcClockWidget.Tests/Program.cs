@@ -7,6 +7,7 @@ var tests = new (string Name, Action Test)[]
     ("clamp handles screens smaller than the widget", ClampHandlesTinyBounds),
     ("union handles displays with negative coordinates", UnionHandlesNegativeCoordinates),
     ("launch options detect reset switch case-insensitively", LaunchOptionsDetectResetSwitch),
+    ("startup registration quotes executable path", StartupRegistrationQuotesExecutablePath),
 };
 
 foreach ((string name, Action test) in tests)
@@ -63,6 +64,13 @@ static void LaunchOptionsDetectResetSwitch()
 {
     AssertTrue(LaunchOptions.ResetRequested(["utc-clock.exe", "--RESET"]));
     AssertFalse(LaunchOptions.ResetRequested(["utc-clock.exe", "--not-reset"]));
+}
+
+static void StartupRegistrationQuotesExecutablePath()
+{
+    string command = StartupRegistration.BuildStartupCommand(@"C:\Program Files\Utc Clock\utc-clock.exe");
+
+    AssertEqual("\"C:\\Program Files\\Utc Clock\\utc-clock.exe\"", command);
 }
 
 static void AssertEqual<T>(T expected, T actual)

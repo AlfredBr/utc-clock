@@ -28,6 +28,9 @@ public partial class App : Application
     /// <param name="args">Details about the launch request and process.</param>
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
+#if !DEBUG
+        StartupRegistration.EnsureCurrentUserRunEntry();
+#endif
         bool resetRequested = LaunchOptions.ResetRequested(Environment.GetCommandLineArgs())
             || LaunchOptions.ResetRequested(args.Arguments.Split(' ', StringSplitOptions.RemoveEmptyEntries));
 

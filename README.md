@@ -13,11 +13,18 @@ a right-click menu for reset and exit.
 - Drag-to-position with persistence under `%LOCALAPPDATA%\UtcClockWidget`
 - Right-click menu with `Reset Position` and `Exit`
 - `--reset` launch option to restore the default position
+- Release builds register the app as a per-user Windows startup app
 
 ## Requirements
 
 - Windows 10 build 17763 or newer; Windows 11 recommended
 - .NET 10 SDK
+
+## Usage
+
+Download a release, extract the zip, and run `utc-clock.exe`. Keep the files in
+the extracted folder together. On first Release launch, the app registers itself
+under the current user's Windows Startup Apps.
 
 ## Commands
 
@@ -25,6 +32,7 @@ a right-click menu for reset and exit.
 dotnet build
 dotnet run --project utc-clock.csproj
 dotnet run --project utc-clock.csproj -- --reset
+dotnet publish utc-clock.csproj -c Release
 dotnet test UtcClockWidget.Tests\UtcClockWidget.Tests.csproj
 ```
 
