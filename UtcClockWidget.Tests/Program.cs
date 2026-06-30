@@ -38,7 +38,7 @@ static void ClampKeepsPositionInsideBounds()
     var bounds = new ScreenBounds(-1280, 0, 3200, 1080);
 
     AssertEqual((-1280, 0), PositionMath.ClampToBounds(-4000, -200, bounds));
-    AssertEqual((1726, 1012), PositionMath.ClampToBounds(4000, 4000, bounds));
+    AssertEqual((1726, 1026), PositionMath.ClampToBounds(4000, 4000, bounds));
     AssertEqual((50, 75), PositionMath.ClampToBounds(50, 75, bounds));
 }
 

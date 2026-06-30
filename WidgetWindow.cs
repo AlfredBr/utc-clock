@@ -19,6 +19,8 @@ internal sealed unsafe class WidgetWindow
     private readonly IntPtr nullPen;
     private readonly IntPtr timeFont;
     private readonly IntPtr labelFont;
+    private readonly IntPtr iconLarge;
+    private readonly IntPtr iconSmall;
     private IntPtr hwnd;
     private bool dragging;
     private NativeMethods.POINT dragStartPointer;
@@ -60,6 +62,23 @@ internal sealed unsafe class WidgetWindow
             NativeMethods.DEFAULT_PITCH | NativeMethods.FF_DONTCARE,
             "Segoe UI Variable Display");
 
+        IntPtr instance = NativeMethods.GetModuleHandle(null);
+        IntPtr iconName = new(NativeMethods.AppIconResourceId);
+        iconLarge = NativeMethods.LoadImage(
+            instance,
+            iconName,
+            NativeMethods.IMAGE_ICON,
+            NativeMethods.GetSystemMetrics(NativeMethods.SM_CXICON),
+            NativeMethods.GetSystemMetrics(NativeMethods.SM_CYICON),
+            NativeMethods.LR_DEFAULTCOLOR);
+        iconSmall = NativeMethods.LoadImage(
+            instance,
+            iconName,
+            NativeMethods.IMAGE_ICON,
+            NativeMethods.GetSystemMetrics(NativeMethods.SM_CXSMICON),
+            NativeMethods.GetSystemMetrics(NativeMethods.SM_CYSMICON),
+            NativeMethods.LR_DEFAULTCOLOR);
+
         RegisterWindowClass();
         CreateWindow(resetRequested);
     }
@@ -93,9 +112,11 @@ internal sealed unsafe class WidgetWindow
             cbSize = (uint)Marshal.SizeOf<NativeMethods.WNDCLASSEX>(),
             lpfnWndProc = &WndProc,
             hInstance = instance,
+            hIcon = iconLarge,
             hCursor = NativeMethods.LoadCursor(IntPtr.Zero, new IntPtr(NativeMethods.IDC_ARROW)),
             hbrBackground = IntPtr.Zero,
             lpszClassName = WindowClassName,
+            hIconSm = iconSmall,
         };
 
         ushort atom = NativeMethods.RegisterClassEx(ref windowClass);
@@ -143,6 +164,8 @@ internal sealed unsafe class WidgetWindow
             PositionMath.WidgetHeight,
             NativeMethods.SWP_NOACTIVATE | NativeMethods.SWP_SHOWWINDOW);
         NativeMethods.SetTimer(hwnd, new UIntPtr(TimerId), 1000, IntPtr.Zero);
+        NativeMethods.SendMessage(hwnd, NativeMethods.WM_SETICON, new UIntPtr(NativeMethods.ICON_BIG), iconLarge);
+        NativeMethods.SendMessage(hwnd, NativeMethods.WM_SETICON, new UIntPtr(NativeMethods.ICON_SMALL), iconSmall);
         PositionStore.Save(position.X, position.Y);
     }
 
@@ -320,5 +343,14 @@ internal sealed unsafe class WidgetWindow
         NativeMethods.DeleteObject(nullPen);
         NativeMethods.DeleteObject(timeFont);
         NativeMethods.DeleteObject(labelFont);
+        if (iconLarge != IntPtr.Zero)
+        {
+            NativeMethods.DestroyIcon(iconLarge);
+        }
+
+        if (iconSmall != IntPtr.Zero)
+        {
+            NativeMethods.DestroyIcon(iconSmall);
+        }
     }
 }

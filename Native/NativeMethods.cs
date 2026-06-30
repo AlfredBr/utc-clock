@@ -28,6 +28,7 @@ internal static unsafe class NativeMethods
 
     internal const int WM_DESTROY = 0x0002;
     internal const int WM_PAINT = 0x000F;
+    internal const int WM_SETICON = 0x0080;
     internal const int WM_TIMER = 0x0113;
     internal const int WM_LBUTTONDOWN = 0x0201;
     internal const int WM_LBUTTONUP = 0x0202;
@@ -37,6 +38,18 @@ internal static unsafe class NativeMethods
     internal const int MK_LBUTTON = 0x0001;
     internal const int IDC_ARROW = 32512;
     internal const int LWA_ALPHA = 0x00000002;
+
+    internal const int ICON_SMALL = 0;
+    internal const int ICON_BIG = 1;
+    internal const uint IMAGE_ICON = 1;
+    internal const uint LR_DEFAULTCOLOR = 0;
+    internal const int SM_CXICON = 11;
+    internal const int SM_CYICON = 12;
+    internal const int SM_CXSMICON = 49;
+    internal const int SM_CYSMICON = 50;
+
+    // Resource id the .NET SDK assigns to the icon group it embeds for <ApplicationIcon>.
+    internal const int AppIconResourceId = 32512;
 
     internal const int MF_STRING = 0x00000000;
     internal const int TPM_RIGHTBUTTON = 0x0002;
@@ -95,6 +108,16 @@ internal static unsafe class NativeMethods
 
     [DllImport("user32.dll")]
     internal static extern IntPtr LoadCursor(IntPtr hInstance, IntPtr lpCursorName);
+
+    [DllImport("user32.dll", EntryPoint = "LoadImageW", SetLastError = true, CharSet = CharSet.Unicode)]
+    internal static extern IntPtr LoadImage(IntPtr hInst, IntPtr name, uint type, int cx, int cy, uint fuLoad);
+
+    [DllImport("user32.dll", EntryPoint = "SendMessageW")]
+    internal static extern IntPtr SendMessage(IntPtr hWnd, uint msg, UIntPtr wParam, IntPtr lParam);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool DestroyIcon(IntPtr hIcon);
 
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     internal static extern IntPtr GetModuleHandle(string? lpModuleName);
