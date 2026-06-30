@@ -10,7 +10,7 @@ internal readonly record struct ScreenBounds(int X, int Y, int Width, int Height
 internal static class PositionMath
 {
     public const int WidgetWidth = 194;
-    public const int WidgetHeight = 68;
+    public const int WidgetHeight = 48;
     public const int DefaultMargin = 24;
 
     public static (int X, int Y) DefaultPosition(ScreenBounds workArea)
