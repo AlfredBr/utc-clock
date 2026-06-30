@@ -170,6 +170,10 @@ internal static unsafe class NativeMethods
     internal static extern bool RoundRect(IntPtr hdc, int left, int top, int right, int bottom, int width, int height);
 
     [DllImport("gdi32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool Rectangle(IntPtr hdc, int left, int top, int right, int bottom);
+
+    [DllImport("gdi32.dll")]
     internal static extern int SetBkMode(IntPtr hdc, int mode);
 
     [DllImport("gdi32.dll")]

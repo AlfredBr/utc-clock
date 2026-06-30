@@ -194,7 +194,7 @@ internal sealed unsafe class WidgetWindow
         IntPtr oldBrush = NativeMethods.SelectObject(hdc, backgroundBrush);
         IntPtr oldPen = NativeMethods.SelectObject(hdc, nullPen);
 
-        NativeMethods.RoundRect(hdc, 0, 0, PositionMath.WidgetWidth + 1, PositionMath.WidgetHeight + 1, 10, 10);
+        NativeMethods.Rectangle(hdc, 0, 0, PositionMath.WidgetWidth + 1, PositionMath.WidgetHeight + 1);
         NativeMethods.SelectObject(hdc, oldPen);
         NativeMethods.SelectObject(hdc, oldBrush);
 
