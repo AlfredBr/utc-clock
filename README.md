@@ -42,6 +42,10 @@ The Release publish output is a standalone native executable:
 publish\utc-clock.exe
 ```
 
+## Native Build Notes
+
+For details on the native conversion, runtime requirements, size comparison, and tradeoffs, see [Native Standalone Build Notes](docs/native-standalone.md).
+
 ## Project Structure
 
 - `Program.cs` - application entry point
