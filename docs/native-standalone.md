@@ -11,7 +11,7 @@ The goal was to publish a single `utc-clock.exe` that can be copied and run with
 The native version still keeps the important user behavior:
 
 - UTC time in `HH:mm` format
-- always-on-top widget window
+- always-on-top widget window that reasserts itself above the taskbar when parked in its strip
 - no taskbar button
 - drag to move
 - right-click `Reset Position` and `Exit`

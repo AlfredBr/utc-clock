@@ -185,6 +185,7 @@ internal sealed unsafe class WidgetWindow
                 return IntPtr.Zero;
             case NativeMethods.WM_TIMER:
                 NativeMethods.InvalidateRect(windowHandle, IntPtr.Zero, false);
+                KeepAboveTaskbar(windowHandle);
                 return IntPtr.Zero;
             case NativeMethods.WM_LBUTTONDOWN:
                 BeginDrag(windowHandle);
@@ -334,6 +335,79 @@ internal sealed unsafe class WidgetWindow
             0,
             NativeMethods.SWP_NOSIZE | NativeMethods.SWP_NOZORDER | NativeMethods.SWP_NOACTIVATE);
         PositionStore.Save(position.X, position.Y);
+    }
+
+    /// <summary>
+    /// The taskbar is topmost too, and Explorer raises it above every other topmost window each
+    /// time it is shown. When the widget is parked in a taskbar strip, put the widget back on top.
+    /// Nothing happens for a widget that does not overlap a taskbar, so other always-on-top
+    /// windows are never fought with.
+    /// </summary>
+    private static void KeepAboveTaskbar(IntPtr windowHandle)
+    {
+        if (!NativeMethods.GetWindowRect(windowHandle, out NativeMethods.RECT widgetRect))
+        {
+            return;
+        }
+
+        ScreenBounds widget = ToBounds(widgetRect);
+        foreach (IntPtr taskbar in TaskbarWindows())
+        {
+            if (NativeMethods.GetWindowRect(taskbar, out NativeMethods.RECT taskbarRect)
+                && PositionMath.Overlaps(widget, ToBounds(taskbarRect))
+                && IsAbove(taskbar, windowHandle))
+            {
+                NativeMethods.SetWindowPos(
+                    windowHandle,
+                    HwndTopMost,
+                    0,
+                    0,
+                    0,
+                    0,
+                    NativeMethods.SWP_NOMOVE | NativeMethods.SWP_NOSIZE | NativeMethods.SWP_NOACTIVATE);
+                return;
+            }
+        }
+    }
+
+    private static List<IntPtr> TaskbarWindows()
+    {
+        var taskbars = new List<IntPtr>(2);
+        IntPtr primary = NativeMethods.FindWindow("Shell_TrayWnd", null);
+        if (primary != IntPtr.Zero)
+        {
+            taskbars.Add(primary);
+        }
+
+        IntPtr secondary = IntPtr.Zero;
+        while ((secondary = NativeMethods.FindWindowEx(IntPtr.Zero, secondary, "Shell_SecondaryTrayWnd", null)) != IntPtr.Zero)
+        {
+            taskbars.Add(secondary);
+        }
+
+        return taskbars;
+    }
+
+    private static bool IsAbove(IntPtr candidate, IntPtr windowHandle)
+    {
+        // Walk from the widget toward the top of the z-order; only windows above it are visited.
+        IntPtr above = NativeMethods.GetWindow(windowHandle, NativeMethods.GW_HWNDPREV);
+        for (int guard = 0; above != IntPtr.Zero && guard < 1024; guard++)
+        {
+            if (above == candidate)
+            {
+                return true;
+            }
+
+            above = NativeMethods.GetWindow(above, NativeMethods.GW_HWNDPREV);
+        }
+
+        return false;
+    }
+
+    private static ScreenBounds ToBounds(NativeMethods.RECT rect)
+    {
+        return new ScreenBounds(rect.Left, rect.Top, rect.Right - rect.Left, rect.Bottom - rect.Top);
     }
 
     private void DestroyResources(IntPtr windowHandle)

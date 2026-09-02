@@ -30,6 +30,14 @@ internal static class PositionMath
             Math.Clamp(y, bounds.Y, maxY));
     }
 
+    public static bool Overlaps(ScreenBounds a, ScreenBounds b)
+    {
+        return a.X < b.Right
+            && b.X < a.Right
+            && a.Y < b.Bottom
+            && b.Y < a.Bottom;
+    }
+
     public static ScreenBounds Union(IEnumerable<ScreenBounds> bounds)
     {
         using var enumerator = bounds.GetEnumerator();

@@ -10,6 +10,7 @@ a right-click menu for reset and exit.
 
 - Displays UTC time in `HH:mm` format
 - Always-on-top, chrome-less Win32 widget
+- Stays above the taskbar when parked in the taskbar strip, including an auto-hide taskbar
 - Single-file native Release executable via .NET Native AOT
 - Drag-to-position with persistence under `%LOCALAPPDATA%\UtcClockWidget`
 - Right-click menu with `Reset Position` and `Exit`

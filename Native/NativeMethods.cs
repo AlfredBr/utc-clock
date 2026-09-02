@@ -25,6 +25,8 @@ internal static unsafe class NativeMethods
     internal const int SWP_NOZORDER = 0x0004;
     internal const int SWP_NOACTIVATE = 0x0010;
     internal const int SWP_SHOWWINDOW = 0x0040;
+    internal const int SWP_NOMOVE = 0x0002;
+    internal const uint GW_HWNDPREV = 3;
 
     internal const int WM_DESTROY = 0x0002;
     internal const int WM_PAINT = 0x000F;
@@ -87,7 +89,7 @@ internal static unsafe class NativeMethods
         IntPtr hInstance,
         IntPtr lpParam);
 
-    [DllImport("user32.dll")]
+    [DllImport("user32.dll", EntryPoint = "DefWindowProcW", CharSet = CharSet.Unicode)]
     internal static extern IntPtr DefWindowProc(IntPtr hWnd, uint msg, UIntPtr wParam, IntPtr lParam);
 
     [DllImport("user32.dll", SetLastError = true)]
@@ -122,7 +124,7 @@ internal static unsafe class NativeMethods
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     internal static extern IntPtr GetModuleHandle(string? lpModuleName);
 
-    [DllImport("user32.dll")]
+    [DllImport("user32.dll", EntryPoint = "GetMessageW", CharSet = CharSet.Unicode)]
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool GetMessage(out MSG lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax);
 
@@ -130,7 +132,7 @@ internal static unsafe class NativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool TranslateMessage(in MSG lpMsg);
 
-    [DllImport("user32.dll")]
+    [DllImport("user32.dll", EntryPoint = "DispatchMessageW", CharSet = CharSet.Unicode)]
     internal static extern IntPtr DispatchMessage(in MSG lpMsg);
 
     [DllImport("user32.dll")]
@@ -244,6 +246,21 @@ internal static unsafe class NativeMethods
 
     [DllImport("user32.dll")]
     internal static extern int GetSystemMetrics(int nIndex);
+
+    [DllImport("user32.dll", EntryPoint = "FindWindowW", CharSet = CharSet.Unicode)]
+    internal static extern IntPtr FindWindow(
+        [MarshalAs(UnmanagedType.LPWStr)] string? lpClassName,
+        [MarshalAs(UnmanagedType.LPWStr)] string? lpWindowName);
+
+    [DllImport("user32.dll", EntryPoint = "FindWindowExW", CharSet = CharSet.Unicode)]
+    internal static extern IntPtr FindWindowEx(
+        IntPtr hWndParent,
+        IntPtr hWndChildAfter,
+        [MarshalAs(UnmanagedType.LPWStr)] string? lpszClass,
+        [MarshalAs(UnmanagedType.LPWStr)] string? lpszWindow);
+
+    [DllImport("user32.dll")]
+    internal static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     internal struct WNDCLASSEX
