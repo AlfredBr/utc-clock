@@ -1,5 +1,12 @@
 # Release Notes
 
+## 2026-09-03
+
+### Design
+
+- **Minute-change animation, brainstormed.** Explored how the widget could animate the digits that change at a minute boundary instead of switching them instantly. Rendering technologies (pure GDI, GDI+, Direct2D/DirectWrite under Native AOT) and four motion proposals were probed, judged and adversarially verified, with frames rendered through the app's actual GDI pipeline on this machine to check the result. Recommendation: a damped odometer roll (only the changing digits roll upward 28 px through their ink band, 280 ms, zero-velocity start and stop, distance-based dimming toward the surface, 40 ms right-to-left carry lag), drawn with pure GDI into a back buffer, resting render pixel-identical to today. Awaiting owner approval; no code written. Discussion and a live comparison board are saved under `docs/superpowers/brainstorming/`.
+- **Finding:** Windows currently reports client-area animations disabled on this machine while the persisted preference says on, so any motion feature needs an in-app override and must re-read the flag rather than cache it.
+
 ## 2026-09-02
 
 ### Fixed
