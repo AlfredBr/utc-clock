@@ -36,6 +36,16 @@ internal static unsafe class NativeMethods
     internal const int WM_LBUTTONUP = 0x0202;
     internal const int WM_MOUSEMOVE = 0x0200;
     internal const int WM_RBUTTONUP = 0x0205;
+    internal const uint WM_QUIT = 0x0012;
+    internal const uint PM_REMOVE = 0x0001;
+
+    internal const int SPI_GETCLIENTAREAANIMATION = 0x1042;
+    internal const int SPI_GETUIEFFECTS = 0x103E;
+    internal const int SM_REMOTESESSION = 0x1000;
+    internal const uint USER_TIMER_MINIMUM = 10;
+    internal const int MF_CHECKED = 0x00000008;
+    internal const uint SRCCOPY = 0x00CC0020;
+    internal const uint ETO_CLIPPED = 0x0004;
 
     internal const int MK_LBUTTON = 0x0001;
     internal const int IDC_ARROW = 32512;
@@ -158,7 +168,46 @@ internal static unsafe class NativeMethods
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static extern bool InvalidateRect(IntPtr hWnd, IntPtr lpRect, bool bErase);
+    internal static extern bool InvalidateRect(IntPtr hWnd, RECT* lpRect, bool bErase);
+
+    [DllImport("user32.dll")]
+    internal static extern IntPtr GetDC(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    internal static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
+
+    [DllImport("user32.dll", EntryPoint = "PeekMessageW", CharSet = CharSet.Unicode)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool PeekMessage(out MSG lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax, uint wRemoveMsg);
+
+    [DllImport("gdi32.dll")]
+    internal static extern IntPtr CreateCompatibleDC(IntPtr hdc);
+
+    [DllImport("gdi32.dll")]
+    internal static extern IntPtr CreateCompatibleBitmap(IntPtr hdc, int cx, int cy);
+
+    [DllImport("gdi32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool DeleteDC(IntPtr hdc);
+
+    [DllImport("gdi32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool BitBlt(IntPtr hdcDest, int x, int y, int cx, int cy, IntPtr hdcSrc, int x1, int y1, uint rop);
+
+    [DllImport("gdi32.dll", EntryPoint = "ExtTextOutW")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool ExtTextOut(IntPtr hdc, int x, int y, uint options, RECT* lprect, char* lpString, uint c, IntPtr lpDx);
+
+    [DllImport("gdi32.dll", EntryPoint = "GetTextExtentPoint32W", CharSet = CharSet.Unicode)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool GetTextExtentPoint32(IntPtr hdc, [MarshalAs(UnmanagedType.LPWStr)] string lpString, int c, out SIZE psizl);
+
+    [DllImport("gdi32.dll", EntryPoint = "GetTextMetricsW")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool GetTextMetrics(IntPtr hdc, out TEXTMETRICW lptm);
+
+    [DllImport("dwmapi.dll")]
+    internal static extern int DwmFlush();
 
     [DllImport("gdi32.dll")]
     internal static extern IntPtr CreateSolidBrush(int colorRef);
@@ -243,6 +292,10 @@ internal static unsafe class NativeMethods
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool SystemParametersInfo(int uiAction, int uiParam, out RECT pvParam, int fWinIni);
+
+    [DllImport("user32.dll", EntryPoint = "SystemParametersInfoW")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool SystemParametersInfo(int uiAction, int uiParam, out int pvParam, int fWinIni);
 
     [DllImport("user32.dll")]
     internal static extern int GetSystemMetrics(int nIndex);
@@ -346,5 +399,37 @@ internal static unsafe class NativeMethods
     {
         public int X;
         public int Y;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct SIZE
+    {
+        public int cx;
+        public int cy;
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    internal struct TEXTMETRICW
+    {
+        public int tmHeight;
+        public int tmAscent;
+        public int tmDescent;
+        public int tmInternalLeading;
+        public int tmExternalLeading;
+        public int tmAveCharWidth;
+        public int tmMaxCharWidth;
+        public int tmWeight;
+        public int tmOverhang;
+        public int tmDigitizedAspectX;
+        public int tmDigitizedAspectY;
+        public ushort tmFirstChar;
+        public ushort tmLastChar;
+        public ushort tmDefaultChar;
+        public ushort tmBreakChar;
+        public byte tmItalic;
+        public byte tmUnderlined;
+        public byte tmStruckOut;
+        public byte tmPitchAndFamily;
+        public byte tmCharSet;
     }
 }

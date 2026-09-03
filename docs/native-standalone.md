@@ -11,6 +11,7 @@ The goal was to publish a single `utc-clock.exe` that can be copied and run with
 The native version still keeps the important user behavior:
 
 - UTC time in `HH:mm` format
+- animated minute change drawn with GDI into a back buffer (see `RELEASE_NOTES.md`, 2026-09-03)
 - always-on-top widget window that reasserts itself above the taskbar when parked in its strip
 - no taskbar button
 - drag to move
@@ -72,10 +73,10 @@ publish\utc-clock.exe
 
 ### Made JSON persistence AOT-safe
 
-`PositionStore` now uses a source-generated `System.Text.Json` context:
+`PositionStore` uses a source-generated `System.Text.Json` context (since 2026-09-03 the DTO and context live in `Services/PositionDto.cs` so the test project can compile them):
 
 ```csharp
-[JsonSerializable(typeof(PositionStore.PositionDto))]
+[JsonSerializable(typeof(PositionDto))]
 internal sealed partial class PositionJsonContext : JsonSerializerContext
 {
 }

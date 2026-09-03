@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using utc_clock.Native;
 
 namespace utc_clock.Services;
@@ -31,28 +30,25 @@ internal static class PositionStore
 
     public static (int X, int Y)? Load()
     {
-        try
-        {
-            if (!File.Exists(FilePath))
-            {
-                return null;
-            }
-
-            string json = File.ReadAllText(FilePath);
-            PositionDto? position = JsonSerializer.Deserialize(json, PositionJsonContext.Default.PositionDto);
-            return position is null ? null : (position.X, position.Y);
-        }
-        catch
-        {
-            return null;
-        }
+        PositionDto? position = LoadDto();
+        return position is null ? null : (position.X, position.Y);
     }
 
+    public static bool? LoadAnimateSetting()
+    {
+        return LoadDto()?.AnimateMinuteChange;
+    }
+
+    /// <summary>Saves the window position and keeps every other persisted setting as it was.</summary>
     public static void Save(int x, int y)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
-        string json = JsonSerializer.Serialize(new PositionDto { X = x, Y = y }, PositionJsonContext.Default.PositionDto);
-        File.WriteAllText(FilePath, json);
+        WriteDto(PositionDto.WithPosition(LoadDto(), x, y));
+    }
+
+    /// <summary>Saves the animate choice together with the live window position, so a missing file never records (0, 0).</summary>
+    public static void SaveAnimateSetting(bool? value, int x, int y)
+    {
+        WriteDto(new PositionDto { X = x, Y = y, AnimateMinuteChange = value });
     }
 
     public static (int X, int Y) ClampToVirtualScreen(int x, int y)
@@ -70,15 +66,41 @@ internal static class PositionStore
             NativeMethods.GetSystemMetrics(NativeMethods.SM_CYVIRTUALSCREEN));
     }
 
-    internal sealed class PositionDto
+    private static PositionDto? LoadDto()
     {
-        public int X { get; set; }
+        try
+        {
+            if (!File.Exists(FilePath))
+            {
+                return null;
+            }
 
-        public int Y { get; set; }
+            string json = File.ReadAllText(FilePath);
+            return JsonSerializer.Deserialize(json, PositionJsonContext.Default.PositionDto);
+        }
+        catch
+        {
+            return null;
+        }
     }
-}
 
-[JsonSerializable(typeof(PositionStore.PositionDto))]
-internal sealed partial class PositionJsonContext : JsonSerializerContext
-{
+    /// <summary>
+    /// Best-effort, like the Run-key registration: a read-only or redirected LocalAppData must not
+    /// terminate the widget, it just stops remembering the position and the animate choice.
+    /// </summary>
+    private static void WriteDto(PositionDto dto)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
+            string json = JsonSerializer.Serialize(dto, PositionJsonContext.Default.PositionDto);
+            File.WriteAllText(FilePath, json);
+        }
+        catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
+        {
+        }
+    }
 }
